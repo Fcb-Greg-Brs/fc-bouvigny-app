@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#001d4a">
+
+  <title>FC Bouvigny-Boyeffles</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background:
+        linear-gradient(160deg, #00132f, #002b62 55%, #00162f);
+      color: white;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .app {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    /* HEADER */
+
+    header {
+      padding: 32px 20px 25px;
+      text-align: center;
+      background:
+        linear-gradient(135deg, #001943, #003377);
+      border-bottom: 3px solid #ffd500;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: auto;
+      border-radius: 50%;
+      background: #ffd500;
+      color: #002459;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 900;
+      font-size: 25px;
+      border: 4px solid white;
+    }
+
+    header h1 {
+      margin-top: 14px;
+      color: #ffd500;
+      font-size: 26px;
+    }
+
+    header h2 {
+      font-size: 20px;
+      margin-top: 3px;
+    }
+
+    .motto {
+      color: #ffd500;
+      font-style: italic;
+      margin-top: 9px;
+      font-weight: bold;
+    }
+
+    /* CONTENT */
+
+    main {
+      padding: 18px;
+    }
+
+    .card {
+      background: rgba(0, 35, 78, .9);
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 16px;
+      padding: 17px;
+      margin-bottom: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+    }
+
+    .title {
+      color: #ffd500;
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    /* MATCH */
+
+    .match {
+      display: grid;
+      grid-template-columns: 1fr 55px 1fr;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .team-logo {
+      width: 65px;
+      height: 65px;
+      margin: auto auto 8px;
+      background: #ffd500;
+      color: #002459;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .opponent {
+      background: #eee;
+    }
+
+    .vs {
+      background: #ffd500;
+      color: #002459;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 900;
+      font-size: 19px;
+    }
+
+    .match-info {
+      margin-top: 17px;
+      padding-top: 14px;
+      border-top: 1px solid #31577f;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    /* CONVOCATION */
+
+    .convocation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+    }
+
+    .yellow-button {
+      background: #ffd500;
+      color: #002459;
+      padding: 14px 17px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    /* MENU GRID */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 10px;
+    }
+
+    .menu-card {
+      min-height: 110px;
+      background: #062e63;
+      border: 1px solid #416489;
+      border-radius: 13px;
+      padding: 16px 8px;
+      text-align: center;
+    }
+
+    .menu-icon {
+      font-size: 30px;
+      margin-bottom: 9px;
+    }
+
+    .menu-card strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .menu-card small {
+      color: #ccd7e7;
+    }
+
+    /* RESULTS */
+
+    .result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid #31577f;
+    }
+
+    .score {
+      color: #ffd500;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    /* NEWS */
+
+    .news {
+      background: #05295b;
+      border-radius: 10px;
+      padding: 13px;
+      margin-top: 9px;
+    }
+
+    .tag {
+      background: #ffd500;
+      color: #002459;
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    /* BOTTOM NAV */
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #001b43;
+      border-top: 1px solid #527197;
+      height: 75px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 10;
+    }
+
+    nav button {
+      color: white;
+      background: none;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    nav span {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 4px;
+    }
+
+    nav .active {
+      color: #ffd500;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="logo">FCB</div>
+  <h1>F.C.</h1>
+  <h2>BOUVIGNY-BOYEFFLES</h2>
+  <div class="motto">ENSEMBLE, PLUS FORTS !</div>
+</header>
+
+<main>
+
+  <section class="card">
+
+    <div class="title">
+      📅 PROCHAIN MATCH
+    </div>
+
+    <div class="match">
+
+      <div>
+        <div class="team-logo">FCB</div>
+        <strong>FC BOUVIGNY<br>BOYEFFLES</strong>
+      </div>
+
+      <div class="vs">VS</div>
+
+      <div>
+        <div class="team-logo opponent">⚽</div>
+        <strong>ADVERSAIRE</strong>
+      </div>
+
+    </div>
+
+    <div class="match-info">
+      📅 Prochain match<br>
+      🕒 Heure à venir<br>
+      📍 Stade Municipal
+    </div>
+
+  </section>
+
+  <section class="card">
+
+    <div class="convocation">
+
+      <div>
+        <div class="title" style="margin-bottom:5px;">
+          👤 MA CONVOCATION
+        </div>
+
+        <small>
+          Connecte-toi pour voir tes convocations.
+        </small>
+      </div>
+
+      <button class="yellow-button">
+        SE CONNECTER
+      </button>
+
+    </div>
+
+  </section>
+
+  <section class="card">
+
+    <div class="grid">
+
+      <div class="menu-card">
+        <div class="menu-icon">📅</div>
+        <strong>MATCHS</strong>
+        <small>Calendrier & résultats</small>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-icon">👥</div>
+        <strong>NOS ÉQUIPES</strong>
+        <small>Découvrez nos équipes</small>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-icon">🏆</div>
+        <strong>CLASSEMENTS</strong>
+        <small>Suivez nos équipes</small>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-icon">📊</div>
+        <strong>STATISTIQUES</strong>
+        <small>Joueurs & équipes</small>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-icon">📰</div>
+        <strong>ACTUALITÉS</strong>
+        <small>News du club</small>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-icon">📷</div>
+        <strong>GALERIE</strong>
+        <small>Photos & vidéos</small>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="card">
+
+    <div class="title">
+      DERNIERS RÉSULTATS
+    </div>
+
+    <div class="result">
+      <div>
+        <strong>FC Bouvigny-Boyeffles</strong><br>
+        <small>Senior A</small>
+      </div>
+
+      <div class="score">2 - 1</div>
+    </div>
+
+    <div class="result">
+      <div>
+        <strong>FC Bouvigny-Boyeffles</strong><br>
+        <small>Senior B</small>
+      </div>
+
+      <div class="score">0 - 0</div>
+    </div>
+
+  </section>
+
+  <section class="card">
+
+    <div class="title">
+      DERNIÈRES ACTUALITÉS
+    </div>
+
+    <article class="news">
+      <div class="tag">CLUB</div>
+      <h3>Bienvenue sur l'application du club</h3>
+      <p>
+        Retrouvez prochainement toutes les actualités
+        du FC Bouvigny-Boyeffles.
+      </p>
+    </article>
+
+    <article class="news">
+      <div class="tag">ÉQUIPE</div>
+      <h3>Mercato</h3>
+      <p>
+        Les nouvelles recrues seront présentées ici.
+      </p>
+    </article>
+
+  </section>
+
+</main>
+
+</div>
+
+<nav>
+
+  <button class="active">
+    <span>⌂</span>
+    ACCUEIL
+  </button>
+
+  <button>
+    <span>▣</span>
+    MATCHS
+  </button>
+
+  <button>
+    <span>♟</span>
+    ÉQUIPES
+  </button>
+
+  <button>
+    <span>▤</span>
+    ACTUALITÉS
+  </button>
+
+  <button>
+    <span>☰</span>
+    MENU
+  </button>
+
+</nav>
+
+</body>
+</html>
