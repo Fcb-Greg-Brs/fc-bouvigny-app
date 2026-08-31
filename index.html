@@ -296,15 +296,13 @@
 
       <div>
         <div class="team-logo opponent">⚽</div>
-        <strong>ADVERSAIRE</strong>
+        <strong id="opponent-name">Chargement...</strong>
       </div>
 
     </div>
 
-    <div class="match-info">
-      📅 Prochain match<br>
-      🕒 Heure à venir<br>
-      📍 Stade Municipal
+    <div class="match-info" id="match-info">
+  Chargement du prochain match...
     </div>
 
   </section>
@@ -407,23 +405,10 @@
       DERNIÈRES ACTUALITÉS
     </div>
 
-    <article class="news">
-      <div class="tag">CLUB</div>
-      <h3>Bienvenue sur l'application du club</h3>
-      <p>
-        Retrouvez prochainement toutes les actualités
-        du FC Bouvigny-Boyeffles.
-      </p>
-    </article>
-
-    <article class="news">
-      <div class="tag">ÉQUIPE</div>
-      <h3>Mercato</h3>
-      <p>
-        Les nouvelles recrues seront présentées ici.
-      </p>
-    </article>
-
+<div id="news-list">
+  Chargement des actualités...
+</div>
+    
   </section>
 
 </main>
@@ -458,6 +443,159 @@
   </button>
 
 </nav>
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+  const SUPABASE_URL = 'https://bdtailbdbomvfczmixbf.supabase.co';
+
+  const SUPABASE_KEY =
+    'sb_publishable_-FACWEzmX9BgGt5rT4bOhg_ojcsUH_-';
+
+  const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  function formatTime(dateString) {
+    const date = new Date(dateString);
+
+    return date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  async function loadNextMatch() {
+
+    const now = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('matches')
+      .select(`
+        *,
+        teams (
+          name,
+          division
+        )
+      `)
+      .gte('match_date', now)
+      .eq('status', 'scheduled')
+      .order('match_date', {
+        ascending: true
+      })
+      .limit(1)
+      .maybeSingle();
+
+    const opponent =
+      document.getElementById('opponent-name');
+
+    const info =
+      document.getElementById('match-info');
+
+    if (error) {
+      console.error(error);
+
+      info.innerHTML =
+        'Impossible de charger le prochain match.';
+
+      return;
+    }
+
+    if (!data) {
+
+      opponent.textContent =
+        'À VENIR';
+
+      info.innerHTML =
+        'Aucun prochain match enregistré.';
+
+      return;
+    }
+
+    opponent.textContent =
+      data.opponent_name;
+
+    info.innerHTML = `
+      📅 ${formatDate(data.match_date)}
+      <br>
+      🕒 ${formatTime(data.match_date)}
+      <br>
+      📍 ${data.stadium || data.location || 'Lieu à définir'}
+      <br>
+      ⚽ ${data.teams?.name || ''}
+      ${data.teams?.division
+        ? ' • ' + data.teams.division
+        : ''}
+    `;
+  }
+
+  async function loadNews() {
+
+    const container =
+      document.getElementById('news-list');
+
+    const { data, error } = await supabase
+      .from('news')
+      .select('*')
+      .eq('is_published', true)
+      .order('published_at', {
+        ascending: false
+      })
+      .limit(5);
+
+    if (error) {
+
+      console.error(error);
+
+      container.innerHTML =
+        '<p>Impossible de charger les actualités.</p>';
+
+      return;
+    }
+
+    if (!data || data.length === 0) {
+
+      container.innerHTML =
+        '<p>Aucune actualité publiée pour le moment.</p>';
+
+      return;
+    }
+
+    container.innerHTML =
+      data.map(article => `
+
+        <article class="news">
+
+          <div class="tag">
+            ${article.category || 'CLUB'}
+          </div>
+
+          <h3>
+            ${article.title}
+          </h3>
+
+          <p>
+            ${article.content}
+          </p>
+
+        </article>
+
+      `).join('');
+  }
+
+  loadNextMatch();
+  loadNews();
+</script>
 </body>
 </html>
