@@ -321,8 +321,8 @@
         </small>
       </div>
 
-      <button class="yellow-button">
-        SE CONNECTER
+      <button class="yellow-button" id="login-button">
+  SE CONNECTER
       </button>
 
     </div>
@@ -415,6 +415,178 @@
 
 </div>
 
+  <!-- CONNEXION -->
+
+<div id="login-modal" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+">
+
+  <div style="
+    width:100%;
+    max-width:420px;
+    background:#00275a;
+    border:1px solid #ffd500;
+    border-radius:18px;
+    padding:22px;
+  ">
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    ">
+
+      <h2 style="color:#ffd500;">
+        Connexion
+      </h2>
+
+      <button id="close-login"
+        style="
+          background:none;
+          color:white;
+          font-size:26px;
+        ">
+        ✕
+      </button>
+
+    </div>
+
+    <input
+      id="login-email"
+      type="email"
+      placeholder="Adresse e-mail"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="login-password"
+      type="password"
+      placeholder="Mot de passe"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:15px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <button
+      id="do-login"
+      class="yellow-button"
+      style="width:100%;">
+      SE CONNECTER
+    </button>
+
+    <p
+      id="login-message"
+      style="
+        margin-top:14px;
+        text-align:center;
+      ">
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- ESPACE UTILISATEUR -->
+
+<section
+  id="user-space"
+  class="card"
+  style="
+    display:none;
+    margin:18px;
+  ">
+
+  <div class="title">
+    🔐 MON ESPACE
+  </div>
+
+  <div id="user-info"></div>
+
+  <button
+    id="logout-button"
+    class="yellow-button"
+    style="margin-top:15px;">
+    SE DÉCONNECTER
+  </button>
+
+</section>
+
+
+<!-- PANNEAU ADMIN -->
+
+<section
+  id="admin-space"
+  class="card"
+  style="
+    display:none;
+    margin:18px;
+    border-color:#ffd500;
+  ">
+
+  <div class="title">
+    🛡️ ESPACE DIRIGEANT
+  </div>
+
+  <p style="margin-bottom:15px;">
+    Vous êtes connecté avec les droits de gestion du club.
+  </p>
+
+  <div class="grid">
+
+    <div class="menu-card">
+      <div class="menu-icon">⚽</div>
+      <strong>AJOUTER UN MATCH</strong>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-icon">👤</div>
+      <strong>GÉRER LES JOUEURS</strong>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-icon">📋</div>
+      <strong>CONVOCATIONS</strong>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-icon">🧩</div>
+      <strong>COMPOSITIONS</strong>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-icon">🏃</div>
+      <strong>ENTRAÎNEMENTS</strong>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-icon">📰</div>
+      <strong>ACTUALITÉS</strong>
+    </div>
+
+  </div>
+
+</section>
 <nav>
 
   <button class="active">
@@ -444,43 +616,69 @@
 
 </nav>
 <script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-  const SUPABASE_URL = 'https://bdtailbdbomvfczmixbf.supabase.co';
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2';
 
-  const SUPABASE_KEY =
-    'sb_publishable_-FACWEzmX9BgGt5rT4bOhg_ojcsUH_-';
+const SUPABASE_URL =
+'https://bdtailbdbomvfczmixbf.supabase.co';
 
-  const supabase = createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
+const SUPABASE_KEY =
+'sb_publishable_-FACWEzmX9BgGt5rT4bOhg_ojcsUH_-';
+
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* ==============================
+   DATES
+================================ */
+
+function formatDate(dateString) {
+
+  const date =
+    new Date(dateString);
+
+  return date.toLocaleDateString(
+    'fr-FR',
+    {
+      weekday:'long',
+      day:'numeric',
+      month:'long',
+      year:'numeric'
+    }
   );
+}
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
 
-    return date.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  }
+function formatTime(dateString) {
 
-  function formatTime(dateString) {
-    const date = new Date(dateString);
+  const date =
+    new Date(dateString);
 
-    return date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+  return date.toLocaleTimeString(
+    'fr-FR',
+    {
+      hour:'2-digit',
+      minute:'2-digit'
+    }
+  );
+}
 
-  async function loadNextMatch() {
 
-    const now = new Date().toISOString();
+/* ==============================
+   PROCHAIN MATCH
+================================ */
 
-    const { data, error } = await supabase
+async function loadNextMatch() {
+
+  const now =
+    new Date().toISOString();
+
+  const { data, error } =
+    await supabase
       .from('matches')
       .select(`
         *,
@@ -491,111 +689,471 @@
       `)
       .gte('match_date', now)
       .eq('status', 'scheduled')
-      .order('match_date', {
-        ascending: true
-      })
+      .order(
+        'match_date',
+        { ascending:true }
+      )
       .limit(1)
       .maybeSingle();
 
-    const opponent =
-      document.getElementById('opponent-name');
 
-    const info =
-      document.getElementById('match-info');
+  const opponent =
+    document.getElementById(
+      'opponent-name'
+    );
 
-    if (error) {
-      console.error(error);
+  const info =
+    document.getElementById(
+      'match-info'
+    );
 
-      info.innerHTML =
-        'Impossible de charger le prochain match.';
 
-      return;
-    }
+  if(error) {
 
-    if (!data) {
+    console.error(error);
 
-      opponent.textContent =
-        'À VENIR';
+    info.innerHTML =
+      'Impossible de charger le prochain match.';
 
-      info.innerHTML =
-        'Aucun prochain match enregistré.';
+    return;
+  }
 
-      return;
-    }
+
+  if(!data) {
 
     opponent.textContent =
-      data.opponent_name;
+      'À VENIR';
 
-    info.innerHTML = `
-      📅 ${formatDate(data.match_date)}
-      <br>
-      🕒 ${formatTime(data.match_date)}
-      <br>
-      📍 ${data.stadium || data.location || 'Lieu à définir'}
-      <br>
-      ⚽ ${data.teams?.name || ''}
-      ${data.teams?.division
-        ? ' • ' + data.teams.division
-        : ''}
-    `;
+    info.innerHTML =
+      'Aucun prochain match enregistré.';
+
+    return;
   }
 
-  async function loadNews() {
 
-    const container =
-      document.getElementById('news-list');
+  opponent.textContent =
+    data.opponent_name;
 
-    const { data, error } = await supabase
+
+  info.innerHTML = `
+    📅 ${formatDate(data.match_date)}
+    <br>
+    🕒 ${formatTime(data.match_date)}
+    <br>
+    📍 ${
+      data.stadium
+      ||
+      data.location
+      ||
+      'Lieu à définir'
+    }
+    <br>
+    ⚽ ${
+      data.teams?.name
+      ||
+      ''
+    }
+    ${
+      data.teams?.division
+      ?
+      ' • ' + data.teams.division
+      :
+      ''
+    }
+  `;
+}
+
+
+/* ==============================
+   ACTUALITÉS
+================================ */
+
+async function loadNews() {
+
+  const container =
+    document.getElementById(
+      'news-list'
+    );
+
+
+  const { data, error } =
+    await supabase
       .from('news')
       .select('*')
-      .eq('is_published', true)
-      .order('published_at', {
-        ascending: false
-      })
+      .eq(
+        'is_published',
+        true
+      )
+      .order(
+        'published_at',
+        { ascending:false }
+      )
       .limit(5);
 
-    if (error) {
 
-      console.error(error);
+  if(error) {
 
-      container.innerHTML =
-        '<p>Impossible de charger les actualités.</p>';
-
-      return;
-    }
-
-    if (!data || data.length === 0) {
-
-      container.innerHTML =
-        '<p>Aucune actualité publiée pour le moment.</p>';
-
-      return;
-    }
+    console.error(error);
 
     container.innerHTML =
-      data.map(article => `
+      '<p>Impossible de charger les actualités.</p>';
 
-        <article class="news">
-
-          <div class="tag">
-            ${article.category || 'CLUB'}
-          </div>
-
-          <h3>
-            ${article.title}
-          </h3>
-
-          <p>
-            ${article.content}
-          </p>
-
-        </article>
-
-      `).join('');
+    return;
   }
 
-  loadNextMatch();
-  loadNews();
+
+  if(
+    !data
+    ||
+    data.length === 0
+  ) {
+
+    container.innerHTML =
+      '<p>Aucune actualité publiée pour le moment.</p>';
+
+    return;
+  }
+
+
+  container.innerHTML =
+    data.map(article => `
+
+      <article class="news">
+
+        <div class="tag">
+          ${
+            article.category
+            ||
+            'CLUB'
+          }
+        </div>
+
+        <h3>
+          ${article.title}
+        </h3>
+
+        <p>
+          ${article.content}
+        </p>
+
+      </article>
+
+    `).join('');
+}
+
+
+/* ==============================
+   CONNEXION
+================================ */
+
+const loginButton =
+  document.getElementById(
+    'login-button'
+  );
+
+const modal =
+  document.getElementById(
+    'login-modal'
+  );
+
+const closeLogin =
+  document.getElementById(
+    'close-login'
+  );
+
+const doLogin =
+  document.getElementById(
+    'do-login'
+  );
+
+const loginMessage =
+  document.getElementById(
+    'login-message'
+  );
+
+
+loginButton.addEventListener(
+  'click',
+  () => {
+
+    modal.style.display =
+      'flex';
+
+  }
+);
+
+
+closeLogin.addEventListener(
+  'click',
+  () => {
+
+    modal.style.display =
+      'none';
+
+  }
+);
+
+
+doLogin.addEventListener(
+  'click',
+  async () => {
+
+    const email =
+      document
+        .getElementById(
+          'login-email'
+        )
+        .value
+        .trim();
+
+    const password =
+      document
+        .getElementById(
+          'login-password'
+        )
+        .value;
+
+
+    loginMessage.textContent =
+      'Connexion...';
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase.auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+
+    if(error) {
+
+      loginMessage.style.color =
+        '#ff6b6b';
+
+      loginMessage.textContent =
+        'E-mail ou mot de passe incorrect.';
+
+      return;
+    }
+
+
+    loginMessage.style.color =
+      '#78e08f';
+
+    loginMessage.textContent =
+      'Connexion réussie ✅';
+
+
+    setTimeout(() => {
+
+      modal.style.display =
+        'none';
+
+    }, 600);
+
+
+    await updateUserInterface();
+  }
+);
+
+
+/* ==============================
+   UTILISATEUR CONNECTÉ
+================================ */
+
+async function updateUserInterface() {
+
+  const {
+    data: {
+      session
+    }
+  } =
+    await supabase.auth
+      .getSession();
+
+
+  const userSpace =
+    document.getElementById(
+      'user-space'
+    );
+
+  const adminSpace =
+    document.getElementById(
+      'admin-space'
+    );
+
+  const userInfo =
+    document.getElementById(
+      'user-info'
+    );
+
+
+  if(!session) {
+
+    userSpace.style.display =
+      'none';
+
+    adminSpace.style.display =
+      'none';
+
+    loginButton.textContent =
+      'SE CONNECTER';
+
+    return;
+  }
+
+
+  const user =
+    session.user;
+
+
+  const {
+    data: profile,
+    error
+  } =
+    await supabase
+      .from('profiles')
+      .select(
+        'first_name,last_name,role'
+      )
+      .eq(
+        'id',
+        user.id
+      )
+      .single();
+
+
+  if(error) {
+
+    console.error(error);
+
+    return;
+  }
+
+
+  userSpace.style.display =
+    'block';
+
+
+  loginButton.textContent =
+    'MON ESPACE';
+
+
+  let roleLabel =
+    'Joueur';
+
+
+  if(profile.role === 'coach') {
+
+    roleLabel =
+      'Coach';
+
+  }
+
+
+  if(profile.role === 'admin') {
+
+    roleLabel =
+      'Dirigeant / Administrateur';
+
+  }
+
+
+  userInfo.innerHTML = `
+
+    <strong>
+      ${
+        profile.first_name
+        ||
+        ''
+      }
+
+      ${
+        profile.last_name
+        ||
+        ''
+      }
+    </strong>
+
+    <br><br>
+
+    👤 ${roleLabel}
+
+    <br>
+
+    📧 ${user.email}
+
+  `;
+
+
+  if(
+    profile.role === 'admin'
+    ||
+    profile.role === 'coach'
+  ) {
+
+    adminSpace.style.display =
+      'block';
+
+  }
+  else {
+
+    adminSpace.style.display =
+      'none';
+
+  }
+}
+
+
+/* ==============================
+   DÉCONNEXION
+================================ */
+
+document
+  .getElementById(
+    'logout-button'
+  )
+  .addEventListener(
+    'click',
+    async () => {
+
+      await supabase.auth
+        .signOut();
+
+      await updateUserInterface();
+
+    }
+  );
+
+
+/* ==============================
+   CHANGEMENT DE SESSION
+================================ */
+
+supabase.auth
+  .onAuthStateChange(
+    () => {
+
+      updateUserInterface();
+
+    }
+  );
+
+
+/* ==============================
+   DÉMARRAGE
+================================ */
+
+loadNextMatch();
+
+loadNews();
+
+updateUserInterface();
+
 </script>
 </body>
 </html>
