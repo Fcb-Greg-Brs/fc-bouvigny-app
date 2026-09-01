@@ -554,10 +554,10 @@
 
   <div class="grid">
 
-    <div class="menu-card">
-      <div class="menu-icon">⚽</div>
-      <strong>AJOUTER UN MATCH</strong>
-    </div>
+    <div class="menu-card" id="open-add-match">
+  <div class="menu-icon">⚽</div>
+  <strong>AJOUTER UN MATCH</strong>
+</div>
 
     <div class="menu-card">
       <div class="menu-icon">👤</div>
@@ -621,6 +621,142 @@
 
   </div>
   </section>
+  <div id="add-match-modal" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+">
+
+  <div style="
+    width:100%;
+    max-width:430px;
+    background:#00275a;
+    border:1px solid #ffd500;
+    border-radius:18px;
+    padding:22px;
+  ">
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+    ">
+
+      <h2 style="color:#ffd500;">
+        Ajouter un match
+      </h2>
+
+      <button id="close-add-match"
+        style="
+          background:none;
+          color:white;
+          font-size:26px;
+        ">
+        ✕
+      </button>
+
+    </div>
+
+    <select id="match-team" style="
+      width:100%;
+      padding:14px;
+      margin-bottom:12px;
+      border-radius:10px;
+      border:none;
+      font-size:16px;
+    ">
+      <option value="">Choisir une équipe</option>
+    </select>
+
+    <input
+      id="match-opponent"
+      type="text"
+      placeholder="Nom de l'adversaire"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="match-competition"
+      type="text"
+      placeholder="Compétition / Division"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="match-date"
+      type="datetime-local"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="match-stadium"
+      type="text"
+      placeholder="Stade / lieu"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <select id="match-home" style="
+      width:100%;
+      padding:14px;
+      margin-bottom:15px;
+      border-radius:10px;
+      border:none;
+      font-size:16px;
+    ">
+      <option value="true">Domicile</option>
+      <option value="false">Extérieur</option>
+    </select>
+
+    <button
+      id="save-match"
+      class="yellow-button"
+      style="width:100%;">
+      ENREGISTRER LE MATCH
+    </button>
+
+    <p id="match-message"
+      style="
+        margin-top:14px;
+        text-align:center;
+      ">
+    </p>
+
+  </div>
+</div>
   <nav>
 
   <button class="active" id="nav-home">
@@ -1292,6 +1428,170 @@ document
     });
 
   });
+
+  const addMatchModal =
+  document.getElementById('add-match-modal');
+
+const openAddMatch =
+  document.getElementById('open-add-match');
+
+const closeAddMatch =
+  document.getElementById('close-add-match');
+
+const saveMatch =
+  document.getElementById('save-match');
+
+const matchMessage =
+  document.getElementById('match-message');
+
+
+async function loadTeamsForForm() {
+
+  const select =
+    document.getElementById('match-team');
+
+  const { data, error } =
+    await supabase
+      .from('teams')
+      .select('id,name,division')
+      .eq('is_active', true)
+      .order('name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Choisir une équipe</option>';
+
+  data.forEach(team => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = team.id;
+
+    option.textContent =
+      team.division
+        ? `${team.name} • ${team.division}`
+        : team.name;
+
+    select.appendChild(option);
+
+  });
+}
+
+
+openAddMatch.addEventListener(
+  'click',
+  async () => {
+
+    addMatchModal.style.display = 'flex';
+
+    await loadTeamsForForm();
+
+  }
+);
+
+
+closeAddMatch.addEventListener(
+  'click',
+  () => {
+
+    addMatchModal.style.display = 'none';
+
+  }
+);
+
+
+saveMatch.addEventListener(
+  'click',
+  async () => {
+
+    const teamId =
+      document.getElementById('match-team').value;
+
+    const opponent =
+      document.getElementById('match-opponent').value.trim();
+
+    const competition =
+      document.getElementById('match-competition').value.trim();
+
+    const matchDate =
+      document.getElementById('match-date').value;
+
+    const stadium =
+      document.getElementById('match-stadium').value.trim();
+
+    const isHome =
+      document.getElementById('match-home').value === 'true';
+
+
+    if (!teamId || !opponent || !matchDate) {
+
+      matchMessage.style.color = '#ff6b6b';
+
+      matchMessage.textContent =
+        'Équipe, adversaire et date sont obligatoires.';
+
+      return;
+    }
+
+
+    matchMessage.style.color = 'white';
+
+    matchMessage.textContent =
+      'Enregistrement...';
+
+
+    const { error } =
+      await supabase
+        .from('matches')
+        .insert({
+          team_id: Number(teamId),
+          opponent_name: opponent,
+          competition: competition || null,
+          match_date: new Date(matchDate).toISOString(),
+          stadium: stadium || null,
+          is_home: isHome,
+          status: 'scheduled'
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      matchMessage.style.color = '#ff6b6b';
+
+      matchMessage.textContent =
+        'Erreur lors de l’enregistrement.';
+
+      return;
+    }
+
+
+    matchMessage.style.color = '#78e08f';
+
+    matchMessage.textContent =
+      'Match enregistré ✅';
+
+
+    await loadNextMatch();
+
+    await loadMatches();
+
+
+    setTimeout(() => {
+
+      addMatchModal.style.display = 'none';
+
+    }, 900);
+
+  }
+);
+  
 /* ==============================
    DÉMARRAGE
 ================================ */
