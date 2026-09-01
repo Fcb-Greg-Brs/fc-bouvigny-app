@@ -604,8 +604,26 @@
 
   </div>
 </section>
+  <section id="matches-page" style="display:none; padding:18px;">
+  <div class="card">
+
+    <div class="title">
+      ⚽ MATCHS
+    </div>
+
+    <p style="margin-bottom:15px;">
+      Calendrier et résultats du club
+    </p>
+
+    <div id="matches-list">
+      Chargement des matchs...
+    </div>
+
+  </div>
+  </section>
   <nav>
 
+  <button class="active" id="nav-home">
   <button class="active" id="nav-home">
   <span>⌂</span>
   ACCUEIL
@@ -785,7 +803,84 @@ async function loadNextMatch() {
    ACTUALITÉS
 ================================ */
 
-async function loadNews() {
+async function loadNews() {async function loadMatches() {
+
+  const container =
+    document.getElementById('matches-list');
+
+  const { data, error } =
+    await supabase
+      .from('matches')
+      .select(`
+        *,
+        teams (
+          name,
+          division
+        )
+      `)
+      .order('match_date', {
+        ascending: true
+      });
+
+  if (error) {
+    console.error(error);
+
+    container.innerHTML =
+      '<p>Impossible de charger les matchs.</p>';
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML =
+      '<p>Aucun match enregistré pour le moment.</p>';
+
+    return;
+  }
+
+  container.innerHTML =
+    data.map(match => {
+
+      const isFinished =
+        match.status === 'finished';
+
+      const score =
+        isFinished
+        ? `${match.club_score ?? 0} - ${match.opponent_score ?? 0}`
+        : 'VS';
+
+      return `
+        <div class="news" style="margin-bottom:12px;">
+
+          <div class="tag">
+            ${match.teams?.name || 'Équipe'}
+            ${match.teams?.division
+              ? ' • ' + match.teams.division
+              : ''}
+          </div>
+
+          <h3 style="margin-bottom:10px;">
+            FC Bouvigny-Boyeffles
+            <br>
+            ${score}
+            <br>
+            ${match.opponent_name}
+          </h3>
+
+          <p>
+            📅 ${formatDate(match.match_date)}
+            <br>
+            🕒 ${formatTime(match.match_date)}
+            <br>
+            📍 ${match.stadium || match.location || 'Lieu à définir'}
+            <br>
+            ${match.is_home ? '🏠 Domicile' : '✈️ Extérieur'}
+          </p>
+
+        </div>
+      `;
+    }).join('');
+}
 
   const container =
     document.getElementById(
@@ -1160,7 +1255,41 @@ supabase.auth
     }
   );
 
+const homeContent =
+  document.querySelector('main');
 
+const matchesPage =
+  document.getElementById('matches-page');
+
+document
+  .getElementById('nav-matches')
+  .addEventListener('click', async () => {
+
+    homeContent.style.display = 'none';
+    matchesPage.style.display = 'block';
+
+    await loadMatches();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  });
+
+document
+  .getElementById('nav-home')
+  .addEventListener('click', () => {
+
+    matchesPage.style.display = 'none';
+    homeContent.style.display = 'block';
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  });
 /* ==============================
    DÉMARRAGE
 ================================ */
@@ -1171,6 +1300,8 @@ loadNews();
 
 updateUserInterface();
 
+  loadMatches();
+  
 </script>
 </body>
 </html>
