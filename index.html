@@ -558,6 +558,10 @@
   <div class="menu-icon">⚽</div>
   <strong>AJOUTER UN MATCH</strong>
 </div>
+    <div class="menu-card" id="open-add-player">
+  <div class="menu-icon">👤</div>
+  <strong>AJOUTER UN JOUEUR</strong>
+</div>
 
     <div class="menu-card">
       <div class="menu-icon">👤</div>
@@ -757,6 +761,133 @@
 
   </div>
 </div>
+ <div id="add-player-modal" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+">
+
+  <div style="
+    width:100%;
+    max-width:430px;
+    background:#00275a;
+    border:1px solid #ffd500;
+    border-radius:18px;
+    padding:22px;
+  ">
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+    ">
+
+      <h2 style="color:#ffd500;">
+        Ajouter un joueur
+      </h2>
+
+      <button id="close-add-player" style="
+        background:none;
+        border:none;
+        color:white;
+        font-size:26px;
+      ">
+        ✕
+      </button>
+
+    </div>
+
+    <input
+      id="player-first-name"
+      type="text"
+      placeholder="Prénom"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="player-last-name"
+      type="text"
+      placeholder="Nom"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:12px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <select id="player-team" style="
+      width:100%;
+      padding:14px;
+      margin-bottom:12px;
+      border-radius:10px;
+      border:none;
+      font-size:16px;
+    ">
+      <option value="">Choisir une équipe</option>
+    </select>
+
+    <select id="player-position" style="
+      width:100%;
+      padding:14px;
+      margin-bottom:12px;
+      border-radius:10px;
+      border:none;
+      font-size:16px;
+    ">
+      <option value="">Choisir un poste</option>
+      <option value="Gardien">Gardien</option>
+      <option value="Défenseur">Défenseur</option>
+      <option value="Milieu">Milieu</option>
+      <option value="Attaquant">Attaquant</option>
+    </select>
+
+    <input
+      id="player-number"
+      type="number"
+      min="1"
+      max="99"
+      placeholder="Numéro de maillot"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:15px;
+        border-radius:10px;
+        border:none;
+        font-size:16px;
+      "
+    >
+
+    <button
+      id="save-player"
+      class="yellow-button"
+      style="width:100%;">
+      ENREGISTRER LE JOUEUR
+    </button>
+
+    <p id="player-message" style="
+      margin-top:14px;
+      text-align:center;
+    ">
+    </p>
+
+  </div>
+ </div>
   <nav>
 
   <button class="active" id="nav-home">
@@ -1626,6 +1757,195 @@ async function changePassword() {
   alert('Mot de passe enregistré ✅');
 }
   window.changePassword = changePassword;
+
+  /* ==============================
+   AJOUTER UN JOUEUR
+================================ */
+
+const addPlayerModal =
+  document.getElementById('add-player-modal');
+
+const openAddPlayer =
+  document.getElementById('open-add-player');
+
+const closeAddPlayer =
+  document.getElementById('close-add-player');
+
+const savePlayer =
+  document.getElementById('save-player');
+
+const playerMessage =
+  document.getElementById('player-message');
+
+
+async function loadTeamsForPlayerForm() {
+
+  const select =
+    document.getElementById('player-team');
+
+  const { data, error } =
+    await supabase
+      .from('teams')
+      .select('id,name,division')
+      .order('name');
+
+  if (error) {
+    console.error(error);
+
+    playerMessage.style.color = '#ff6b6b';
+    playerMessage.textContent =
+      'Impossible de charger les équipes.';
+
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Choisir une équipe</option>';
+
+  data.forEach(team => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = team.id;
+
+    option.textContent =
+      team.division
+        ? `${team.name} • ${team.division}`
+        : team.name;
+
+    select.appendChild(option);
+
+  });
+}
+
+
+openAddPlayer.addEventListener(
+  'click',
+  async () => {
+
+    playerMessage.textContent = '';
+
+    addPlayerModal.style.display = 'flex';
+
+    await loadTeamsForPlayerForm();
+
+  }
+);
+
+
+closeAddPlayer.addEventListener(
+  'click',
+  () => {
+
+    addPlayerModal.style.display = 'none';
+
+  }
+);
+
+
+savePlayer.addEventListener(
+  'click',
+  async () => {
+
+    const firstName =
+      document
+        .getElementById('player-first-name')
+        .value
+        .trim();
+
+    const lastName =
+      document
+        .getElementById('player-last-name')
+        .value
+        .trim();
+
+    const teamId =
+      document.getElementById('player-team').value;
+
+    const position =
+      document.getElementById('player-position').value;
+
+    const number =
+      document.getElementById('player-number').value;
+
+
+    if (!firstName || !lastName || !teamId) {
+
+      playerMessage.style.color = '#ff6b6b';
+
+      playerMessage.textContent =
+        'Prénom, nom et équipe sont obligatoires.';
+
+      return;
+    }
+
+
+    playerMessage.style.color = 'white';
+
+    playerMessage.textContent =
+      'Enregistrement...';
+
+
+    const { error } =
+      await supabase
+        .from('players')
+        .insert({
+          first_name: firstName,
+          last_name: lastName,
+          team_id: Number(teamId),
+          position: position || null,
+          shirt_number: number
+            ? Number(number)
+            : null,
+          is_active: true
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      playerMessage.style.color = '#ff6b6b';
+
+      playerMessage.textContent =
+        'Erreur lors de l’enregistrement.';
+
+      return;
+    }
+
+
+    playerMessage.style.color = '#78e08f';
+
+    playerMessage.textContent =
+      'Joueur enregistré ✅';
+
+
+    document.getElementById(
+      'player-first-name'
+    ).value = '';
+
+    document.getElementById(
+      'player-last-name'
+    ).value = '';
+
+    document.getElementById(
+      'player-position'
+    ).value = '';
+
+    document.getElementById(
+      'player-number'
+    ).value = '';
+
+
+    setTimeout(() => {
+
+      addPlayerModal.style.display = 'none';
+
+    }, 900);
+
+  }
+);
   
 /* ==============================
    DÉMARRAGE
