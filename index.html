@@ -594,6 +594,29 @@
 <section id="matches-page" style="display:none; padding:18px;">
   <div class="card">
 
+    <section id="teams-page" style="display:none; padding:35px;">
+  <div class="card">
+    <h2>👥 ÉQUIPES</h2>
+    <p>Effectifs du F.C. Bouvigny-Boyeffles</p>
+
+    <div id="teams-list">
+      <p>Chargement des équipes...</p>
+    </div>
+
+    <div id="team-players" style="display:none; margin-top:20px;">
+      <button id="back-to-teams" class="yellow-button">
+        ← RETOUR AUX ÉQUIPES
+      </button>
+
+      <h2 id="selected-team-name" style="margin-top:20px;"></h2>
+
+      <div id="players-list">
+        <p>Chargement des joueurs...</p>
+      </div>
+    </div>
+  </div>
+</section>
+    
     <div class="title">
       ⚽ MATCHS
     </div>
@@ -608,6 +631,7 @@
 
   </div>
 </section>
+  teamsPage.style.display = 'none';
   <section id="matches-page" style="display:none; padding:18px;">
   <div class="card">
 
@@ -901,10 +925,10 @@
   MATCHS
 </button>
 
-  <button>
-    <span>♟</span>
-    ÉQUIPES
-  </button>
+  <div id="nav-teams">
+  <span>👥</span>
+  <small>ÉQUIPES</small>
+  </div>
 
   <button>
     <span>▤</span>
@@ -1946,6 +1970,247 @@ savePlayer.addEventListener(
 
   }
 );
+
+  /* ==============================
+   ÉQUIPES ET JOUEURS
+================================ */
+
+const teamsPage =
+  document.getElementById('teams-page');
+
+const teamsList =
+  document.getElementById('teams-list');
+
+const teamPlayers =
+  document.getElementById('team-players');
+
+const playersList =
+  document.getElementById('players-list');
+
+const selectedTeamName =
+  document.getElementById('selected-team-name');
+
+
+async function loadTeams() {
+
+  teamsList.style.display = 'block';
+  teamPlayers.style.display = 'none';
+
+  const { data, error } =
+    await supabase
+      .from('teams')
+      .select('id,name,division,category')
+      .order('id');
+
+  if (error) {
+
+    console.error(error);
+
+    teamsList.innerHTML =
+      '<p>Impossible de charger les équipes.</p>';
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    teamsList.innerHTML =
+      '<p>Aucune équipe enregistrée.</p>';
+
+    return;
+  }
+
+  teamsList.innerHTML =
+    data.map(team => `
+      <div
+        class="news team-card"
+        data-team-id="${team.id}"
+        data-team-name="${team.name}"
+        style="
+          margin-bottom:15px;
+          cursor:pointer;
+        "
+      >
+
+        <div class="tag">
+          ${team.category || 'Équipe'}
+        </div>
+
+        <h3>
+          ${team.name}
+        </h3>
+
+        <p>
+          ${team.division || ''}
+        </p>
+
+        <p style="
+          color:#ffd500;
+          font-weight:bold;
+          margin-top:10px;
+        ">
+          VOIR L'EFFECTIF →
+        </p>
+
+      </div>
+    `).join('');
+
+
+  document
+    .querySelectorAll('.team-card')
+    .forEach(card => {
+
+      card.addEventListener(
+        'click',
+        async () => {
+
+          const teamId =
+            card.dataset.teamId;
+
+          const teamName =
+            card.dataset.teamName;
+
+          await loadPlayers(
+            teamId,
+            teamName
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+async function loadPlayers(
+  teamId,
+  teamName
+) {
+
+  teamsList.style.display = 'none';
+  teamPlayers.style.display = 'block';
+
+  selectedTeamName.textContent =
+    teamName;
+
+  playersList.innerHTML =
+    '<p>Chargement des joueurs...</p>';
+
+
+  const { data, error } =
+    await supabase
+      .from('public_players')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        position,
+        shirt_number
+      `)
+      .eq('team_id', teamId)
+      .eq('is_active', true)
+      .order('last_name');
+
+
+  if (error) {
+
+    console.error(error);
+
+    playersList.innerHTML =
+      '<p>Impossible de charger les joueurs.</p>';
+
+    return;
+  }
+
+
+  if (!data || data.length === 0) {
+
+    playersList.innerHTML =
+      '<p>Aucun joueur dans cette équipe.</p>';
+
+    return;
+  }
+
+
+  playersList.innerHTML =
+    data.map(player => `
+
+      <div class="news" style="
+        margin-bottom:12px;
+        display:flex;
+        align-items:center;
+        gap:15px;
+      ">
+
+        <div style="
+          width:50px;
+          height:50px;
+          border-radius:50%;
+          background:#ffd500;
+          color:#00275a;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-weight:bold;
+          font-size:18px;
+          flex-shrink:0;
+        ">
+          ${player.shirt_number ?? '—'}
+        </div>
+
+        <div>
+
+          <h3 style="margin:0;">
+            ${player.first_name}
+            ${player.last_name}
+          </h3>
+
+          <p style="margin-top:5px;">
+            ${player.position || 'Poste non renseigné'}
+          </p>
+
+        </div>
+
+      </div>
+
+    `).join('');
+
+}
+
+
+document
+  .getElementById('nav-teams')
+  .addEventListener(
+    'click',
+    async () => {
+
+      homeContent.style.display = 'block';
+      matchesPage.style.display = 'none';
+      teamsPage.style.display = 'none';
+
+      await loadTeams();
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+
+    }
+  );
+
+
+document
+  .getElementById('back-to-teams')
+  .addEventListener(
+    'click',
+    () => {
+
+      teamsList.style.display = 'block';
+      teamPlayers.style.display = 'none';
+
+    }
+  );
   
 /* ==============================
    DÉMARRAGE
