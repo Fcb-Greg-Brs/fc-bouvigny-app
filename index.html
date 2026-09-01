@@ -1574,11 +1574,15 @@ document
   });
 
 document
-  .getElementById('nav-home')
-  .addEventListener('click', () => {
+  .getElementById('nav-teams')
+  .addEventListener('click', async () => {
 
+    homeContent.style.display = 'none';
     matchesPage.style.display = 'none';
-    homeContent.style.display = 'block';
+
+    teamsPage.style.display = 'block';
+
+    await loadTeams();
 
     window.scrollTo({
       top: 0,
