@@ -1591,6 +1591,41 @@ saveMatch.addEventListener(
 
   }
 );
+
+  /* ==============================
+   NOUVEAU MOT DE PASSE
+================================ */
+
+async function changePassword() {
+
+  const newPassword =
+    prompt(
+      'Choisis ton nouveau mot de passe (minimum 8 caractères) :'
+    );
+
+  if (!newPassword) {
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    alert('Le mot de passe doit contenir au moins 8 caractères.');
+    return;
+  }
+
+  const { error } =
+    await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+  if (error) {
+    console.error(error);
+    alert('Impossible de modifier le mot de passe.');
+    return;
+  }
+
+  alert('Mot de passe enregistré ✅');
+}
+  window.changePassword = changePassword;
   
 /* ==============================
    DÉMARRAGE
