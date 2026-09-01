@@ -1557,21 +1557,8 @@ const homeContent =
 const matchesPage =
   document.getElementById('matches-page');
 
-document
-  .getElementById('nav-matches')
-  .addEventListener('click', async () => {
-
-    homeContent.style.display = 'none';
-    matchesPage.style.display = 'block';
-
-    await loadMatches();
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-
-  });
+  const teamsPage =
+  document.getElementById('teams-page');
 
 document
   .getElementById('nav-teams')
